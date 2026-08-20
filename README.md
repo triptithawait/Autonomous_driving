@@ -1,5 +1,7 @@
 # SmartNav AI
 
+Live app: https://vehicle-size-aware-smart-navigation.streamlit.app/
+
 Vehicle-size-aware navigation system for Indian road networks, combining computer vision, fuzzy logic, and graph-based route optimization to suggest routes that are safer and more feasible for different vehicle types.
 
 ## Overview
