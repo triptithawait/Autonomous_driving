@@ -6,12 +6,13 @@ Vehicle-size-aware navigation system for Indian road networks, combining compute
 
 Traditional navigation systems primarily optimize for shortest distance or travel time. In urban and semi-urban environments, especially in India, this often leads to unsafe or impossible routes for larger vehicles such as SUVs, buses, or trucks.
 
-SmartNav AI addresses this by:
+SmartNav AI is a multi-stage perception-to-decision system. It combines:
 
-- estimating road width from road images using a CNN-based classifier,
-- evaluating road suitability using fuzzy logic rules,
-- optimizing routes with vehicle-aware graph costs, and
-- visualizing results through an interactive Streamlit dashboard.
+- perception: CNN-based road-width estimation from camera or image input,
+- decision logic: fuzzy rules that translate road widths and vehicle dimensions into suitability scores,
+- routing: Dijkstra-based path optimization that avoids roads that are too narrow for the selected vehicle.
+
+This creates a full AI pipeline from sensor input to route recommendation, which is aligned with real-world edge-AI engineering work because it emphasizes model efficiency, inference performance, and deployment constraints instead of raw model complexity alone.
 
 ## Key Features
 
@@ -88,17 +89,44 @@ Then open the local URL displayed by Streamlit in your browser.
 
 ## How It Works
 
-### 1. Road Width Analysis
-The CNN model categorizes roads into broad classes like narrow, medium, and wide based on uploaded images or camera input.
+### 1. Perception Layer: Road Width Estimation
+The CNN model categorizes road conditions into classes such as narrow, medium, and wide based on uploaded images or live camera input. In the optimization workflow, this model becomes the inference stage to be measured and compressed for edge deployment.
 
-### 2. Fuzzy Logic Decision System
-The fuzzy engine evaluates road suitability against the user's vehicle dimensions and outputs a suitability score from 0 to 100.
+### 2. Decision Layer: Fuzzy Logic
+The fuzzy engine evaluates road suitability against the user's vehicle dimensions and outputs a suitability score from 0 to 100. This layer translates perception output into a route-feasibility decision for different vehicle types.
 
-### 3. Route Optimization
+### 3. Routing Layer: Dijkstra Optimization
 The graph engine computes both:
 
 - the standard shortest path, and
 - the vehicle-aware safe path that avoids unsuitable roads.
+
+This forms a complete perception-to-decision engine: image/video input -> width estimate -> suitability -> route recommendation.
+
+## Model Optimization & Benchmarking
+
+The project includes a TensorFlow/Keras optimization workflow that is designed for edge-AI and deployment interviews. The Phase 1 benchmark script compares the following MobileNetV2 variants:
+
+- baseline FP32 model
+- TFLite FP32
+- TFLite dynamic-range INT8
+- TFLite full-integer INT8
+- pruned + quantized variant
+
+The benchmark script measures:
+
+- accuracy
+- model size in MB
+- average inference latency in ms per image
+
+The scripts generate:
+
+- a CSV summary table under `optimization/results/phase1_benchmark_results.csv`
+- a chart under `optimization/results/phase1_benchmark_chart.png`
+
+The Phase 2 live-camera workflow reads from a webcam and measures FPS using the fastest optimized model variant. The Phase 3 efficiency comparison scaffold compares MobileNetV2 against a heavier architecture such as ResNet50 on the same road-width task, focusing on the efficiency tradeoff for edge deployment.
+
+Important note: the repository does not contain the trained model artifact or the road-image dataset needed to generate real benchmark numbers. The scripts were implemented to fail clearly and honestly when those files are missing, rather than to fabricate metrics.
 
 ## Usage
 
@@ -118,6 +146,17 @@ A compact car may navigate a shorter route through a narrow lane, while a truck 
 - Real-time congestion integration
 - User-reported road condition feedback
 - Better model calibration and wider training data
+- Full edge deployment on embedded or mobile inference hardware
+
+## Data / Model Requirements Before Full Benchmarking
+
+The following artifacts are required before the optimization, FPS comparison, or efficiency scripts can produce real numbers:
+
+- a trained Keras model file such as `.keras`, `.h5`, or `.hdf5`
+- a road image dataset under a `data/`, `dataset/`, or `images/` folder
+- optional: a ResNet50 reference model for Phase 3 comparison
+
+Without those files, the scripts exit with a clear message instead of reporting fabricated values.
 
 ## License
 
