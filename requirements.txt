@@ -1,0 +1,14 @@
+numpy
+pandas
+opencv-python
+torch
+torchvision
+scikit-fuzzy
+networkx
+matplotlib
+streamlit
+pillow
+osmnx
+folium
+streamlit-folium
+geopy
