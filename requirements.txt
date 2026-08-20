@@ -1,9 +1,10 @@
-numpy
+numpy<2.0
 pandas
+scipy
 opencv-python-headless
 torch
 torchvision
-scikit-fuzzy
+scikit-fuzzy==0.4.2
 networkx
 matplotlib
 streamlit
